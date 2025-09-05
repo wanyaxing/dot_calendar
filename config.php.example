@@ -1,0 +1,22 @@
+<?php
+// 请参考本文件创建config.php文件，并作相关配置
+
+define('DOT_CALENDAR_TOKEN','xxxxxxx');
+// 以上token请自行修改，防止被他人恶意调用
+// 以下配置请根据自己的实际情况修改
+
+// 此处配置钉钉的caldav账户和密码
+define('DINGTALK_CALDAV_USER','u_wnkxxxx');
+define('DINGTALK_CALDAV_PASS','pwdxxxxx');
+
+// 此处配置和风天气的秘钥和API_HOST
+define('QWEATHER_HOST','xxxxxxx.re.qweatherapi.com'); // 和风天气的host
+define('QWEATHER_KEY','4248cdc45e564d148xxxxxxxxx'); // 和风天气的key
+
+
+// 此处配置摘录墨水瓶的设备ID和秘钥
+define('DOT_DEVICE_ID','9C9EXXX01,9C9EXXX02'); // 摘录电子墨水屏幕的设备码，多个用逗号隔开
+define('DOT_APP_KEY','dot_app_xxxxxxxXXXXXX'); // 摘录电子墨水屏幕的应用key  
+
+// 此处配置用户查询日历的经纬度地址
+define('CONFIG_USER_LOCAITON','121.31,31.29'); // 定位经纬度
