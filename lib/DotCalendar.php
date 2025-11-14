@@ -323,9 +323,9 @@ class DotCalendar {
     // 自适应宽度文字转图片
     public static function textToImage($code,$image_width=100,$font_size=26,$pendding=5,$rgb=[255,255,255],$font='',$is_single_line=false)
     {
-        if ($is_single_line && mb_strlen($code)>14){
+        if ($is_single_line && mb_strlen($code)>18){
             // $code="字符内容太长，无法转化图片，请检查。";
-            $code = mb_substr($code,0,14);
+            $code = mb_substr($code,0,18);
         }
 
         if (!$font){
