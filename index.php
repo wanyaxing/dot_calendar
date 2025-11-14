@@ -3,7 +3,23 @@ ini_set("display_errors", "On");
 date_default_timezone_set('Asia/Shanghai');
 error_reporting(E_ALL);
 
-require __DIR__.'/config.php';
+// 此处示例通过参数来切换不同的配置文件（比如：对应不同的设备）
+switch ($_GET['device_idx']??-1) {
+    case 1:
+        require __DIR__.'/config_1.php';
+        break;
+    case 2:
+        require __DIR__.'/config_2.php';
+        break;
+    case 3:
+        require __DIR__.'/config_3.php';
+        break;
+        
+    default:
+        # code...
+        require __DIR__.'/config.php';
+        break;
+}
 
 // 此处添加token验证，防止被他人恶意调用
 if (!isset($_GET['token']) || $_GET['token']!=DOT_CALENDAR_TOKEN){
