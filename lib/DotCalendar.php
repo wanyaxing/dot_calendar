@@ -111,7 +111,18 @@ class DotCalendar {
     }
 
     public function qweatherGetdaily($location,$days = '30d') {
-        return json_decode(static::curl_ungzip('https://'.$this->qweatherHost.'/v7/weather/'.$days.'?location='.$location.'&key='.$this->qweatherKey),true);
+        if (class_exists('W2FileCache')){
+            $cacheKey = 'qweather_daily_'.$location.'_'.$days;
+            $data = W2FileCache::getCache($cacheKey);
+            if ($data!==null){
+                return $data;
+            }
+        }
+        $data = json_decode(static::curl_ungzip('https://'.$this->qweatherHost.'/v7/weather/'.$days.'?location='.$location.'&key='.$this->qweatherKey),true);
+        if (class_exists('W2FileCache')){
+            W2FileCache::setCache($cacheKey,$data,60*5);
+        }
+        return $data;
     }
     
     public function loadWeatherData($days = '30d') {

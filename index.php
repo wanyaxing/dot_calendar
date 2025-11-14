@@ -11,6 +11,9 @@ if (!isset($_GET['token']) || $_GET['token']!=DOT_CALENDAR_TOKEN){
     exit;
 }
 
+define('W2FILECACHE_CACHE_PATH',__DIR__.'/cache/');
+require __DIR__.'/lib/W2FileCache.php';
+
 require __DIR__.'/lib/DotCalendar.php';
 require __DIR__.'/lib/DingtalkCalDAVClient.php';
 
