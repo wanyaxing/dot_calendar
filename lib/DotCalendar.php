@@ -68,13 +68,21 @@ class DotCalendar {
         $firstWarning='';
         $secondWarning='';
         $moreWarning=[];
+        $uniqWarnings=[];
         if (isset($result['warning']) && count($result['warning'])>0){
             foreach ($result['warning'] as $warning) {
-                if ($warning['typeName']=='高温'){
+                if (isset($uniqWarnings[$warning['typeName']])){
+                    continue;
+                }
+                $uniqWarnings[$warning['typeName']] = $warning['typeName'];
+                if ($firstWarning=='' && $warning['typeName']=='高温'){
                     $firstWarning=$warning['typeName'];
                     continue;
                 }else if ($secondWarning=='' && mb_strlen($warning['typeName'])==2){
                     $secondWarning=$warning['typeName'];
+                    continue;
+                }else if ($firstWarning=='' && mb_strlen($warning['typeName'])==2){
+                    $firstWarning=$warning['typeName'];
                     continue;
                 }else{
                     $moreWarning[] = '['.$warning['typeName'].']';
@@ -222,8 +230,11 @@ class DotCalendar {
             
             $param['line'] = $line;
             $param['font'] = static::get_qweather_font($forecast['iconDay']);
-            // 如果晚上天气有雨雪雷雾等恶劣天气，则使用晚上的天气图标
             if (preg_match('/[雨雪雷雾]/u', $forecast['textNight'])) {
+                // 如果晚上天气有雨雪雷雾等恶劣天气，则使用晚上的天气图标
+                $param['font'] = static::get_qweather_font($forecast['iconNight']);
+            } else if ($forecast['fxDate'] == date('Y-m-d') && date('H') >= 17) {
+                // 如果$forecast['fxDate']是今天，且现在已经是12点以后，则使用晚上的天气图标
                 $param['font'] = static::get_qweather_font($forecast['iconNight']);
             }
             $param['dx'] = ($param['week'] - 1) * self::GRID_WIDTH + 1;
@@ -593,7 +604,7 @@ class DotCalendar {
                     $unsunnyTip = $dayStr . $forecast['textDay'];
                     break;
                 } else if (preg_match('/[雨雪雷雾]/u', $forecast['textNight'])) {
-                    if (!$extraInfo) $extraInfo = $dayStr . '夜里' . $forecast['textNight'];
+                    if (!$extraInfo) $extraInfo = $dayStr . '夜间' . $forecast['textNight'];
                     if ($index <= 2) break;
                     $unsunnyTip = $dayStr . $forecast['textNight'];
                     break;
@@ -643,8 +654,8 @@ class DotCalendar {
         // 添加最高温度
         if (isset($warningTypes[0]) && $warningTypes[0]!=''){
             imagerectangle($this->image, 3 + 50 + 15 + 45 - 3, self::BG_HEIGHT - 10 - 15 - 12, 3 + 50 + 15 + 45 + 13, self::BG_HEIGHT - 6, $this->blackColor);
-            imagettftext($this->image, 10, 0, 3 + 50 + 15 + 45, self::BG_HEIGHT - 10 - 15, $this->blackColor, $this->textFont, '高');
-            imagettftext($this->image, 10, 0, 3 + 50 + 15 + 45, self::BG_HEIGHT - 10, $this->blackColor, $this->textFont, '温');
+            imagettftext($this->image, 10, 0, 3 + 50 + 15 + 45, self::BG_HEIGHT - 10 - 15, $this->blackColor, $this->textFont, mb_substr($warningTypes[0],0,1));
+            imagettftext($this->image, 10, 0, 3 + 50 + 15 + 45, self::BG_HEIGHT - 10, $this->blackColor, $this->textFont, mb_substr($warningTypes[0],1));
         }else{
             imagettftext($this->image, 10, 0, 3 + 50 + 15 + 45, self::BG_HEIGHT - 10 - 15, $this->blackColor, $this->textFont, '最');
             imagettftext($this->image, 10, 0, 3 + 50 + 15 + 45, self::BG_HEIGHT - 10, $this->blackColor, $this->textFont, '高');
@@ -661,7 +672,7 @@ class DotCalendar {
             $imageContent = ob_get_clean();
             
             foreach (explode(',',$this->dotDeviceId)  as $deviceId) {
-                static::curl_post(
+                echo static::curl_post(
                     'https://dot.mindreset.tech/api/open/image',
                     json_encode([
                         "deviceId"=> $deviceId,
@@ -677,6 +688,7 @@ class DotCalendar {
                         'Content-Type: application/json'
                     ]
                 );
+                usleep(3000);
             }
         } else {
             header('Content-type: image/png');
