@@ -71,6 +71,13 @@ class DotCalendar {
         $uniqWarnings=[];
         if (isset($result['warning']) && count($result['warning'])>0){
             foreach ($result['warning'] as $warning) {
+                if ($secondWarning=='' || $firstWarning==''){
+                    switch ($warning['typeName']) {
+                        case '道路结冰':
+                            $warning['typeName']='结冰';
+                            break;
+                    }
+                }
                 if (isset($uniqWarnings[$warning['typeName']])){
                     continue;
                 }
@@ -673,14 +680,13 @@ class DotCalendar {
             
             foreach (explode(',',$this->dotDeviceId)  as $deviceId) {
                 echo static::curl_post(
-                    'https://dot.mindreset.tech/api/open/image',
+                    'https://dot.mindreset.tech/api/authV2/open/device/'.$deviceId.'/image',
                     json_encode([
-                        "deviceId"=> $deviceId,
-                        "image"=> base64_encode($imageContent),
-                        "refreshNow"=> true,
-                        "border"=> 0,
-                        "ditherType"=> "NONE",
-                        // "ditherKernel"=> "FLOYD_STEINBERG",
+                        'refreshNow' => true,
+                        'image' => base64_encode($imageContent),
+                        'border' => 0,
+                        'ditherType' => 'NONE',
+                        // 'ditherKernel' => 'FLOYD_STEINBERG',
                         "link"=> "https://dot.mindreset.tech"
                     ], JSON_UNESCAPED_UNICODE),
                     [
@@ -688,7 +694,6 @@ class DotCalendar {
                         'Content-Type: application/json'
                     ]
                 );
-                usleep(3000);
             }
         } else {
             header('Content-type: image/png');

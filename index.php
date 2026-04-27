@@ -59,13 +59,18 @@ if (isset($_GET['calendar']) && $_GET['calendar']){
     // 此处使用钉钉的caldav接口初始化数据示例，用户名和密码为钉钉下获得的授权码
     // 也可以自行使用其他方式来配置这个todolist，只要是字符串数组即可
     $client = new DingtalkCalDAVClient(DINGTALK_CALDAV_USER,DINGTALK_CALDAV_PASS);
+    $start_time = date('Y-m-d H:i:s',strtotime('-2 hours'));
+    $end_time = date('Y-m-d 00:00:00',strtotime('+2 days'));
     $events = $client->getAllEvents(
-        date('Y-m-d H:i:s',strtotime('-2 hours')), // 开始时间
-        date('Y-m-d 00:00:00',strtotime('+2 days'))  // 结束时间
+        $start_time, // 开始时间
+        $end_time  // 结束时间
     );
-    $index_day=date('d');
+    $index_day=date('d',strtotime($start_time));
     foreach ($events as $event) {
         if (isset($event['SUMMARY']) && isset($event['DTSTART'])) {
+            if ($event['DTSTART'] < strtotime($start_time) || $event['DTSTART'] > strtotime($end_time)){
+                continue;
+            }
             if (date('d',$event['DTSTART'])!=$index_day){
                 $todolist[] = "";
                 $index_day = date('d',$event['DTSTART']);
